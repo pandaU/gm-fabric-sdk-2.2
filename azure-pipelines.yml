@@ -1,0 +1,31 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+schedules:
+  - cron: "0 0 * * *" # https://crontab.guru/#0_0_*_*_*
+    displayName: "Daily midnight build"
+    branches:
+      include:
+        - master
+    always: true
+
+trigger:
+  - master
+
+pr:
+  - master
+
+variables:
+  GOPATH: $(Build.Repository.LocalPath)/src/test/fixture
+  FABRIC_VERSION: 2.2
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+jobs:
+  - job: Integration
+    steps:
+      - script: ./scripts/run-integration-tests.sh
+        displayName: Run Tests
