@@ -100,6 +100,7 @@ import org.apache.milagro.amcl.RAND;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.hyperledger.fabric.protos.idemix.Idemix;
 import org.hyperledger.fabric.sdk.Enrollment;
@@ -127,6 +128,7 @@ import org.hyperledger.fabric_ca.sdk.exception.RevocationException;
 import org.hyperledger.fabric_ca.sdk.helper.Config;
 import org.hyperledger.fabric_ca.sdk.helper.Util;
 import org.hyperledger.twgc.gm.sm2.SM2Util;
+import org.hyperledger.twgc.gm.sm3.SM3Util;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -1559,8 +1561,8 @@ public class HFCAClient {
         } else {
             signString = body + "." + cert;
         }
-
-        byte[] signature = cryptoSuite.sign(enrollment.getKey(), signString.getBytes(UTF_8));
+        byte[] hash = SM3Util.hash(new SM3Digest(), signString.getBytes(UTF_8));
+        byte[] signature = cryptoSuite.sign(enrollment.getKey(), hash);
         return cert + "." + b64.encodeToString(signature);
     }
 
